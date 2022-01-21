@@ -1,51 +1,40 @@
-trigger ContactTrigger on Contact (after insert, after update) {
-     // contact has field Active__c
-    // account has field Active_Contacts__c
-    // create trigger to show total child contacts on account 
-    // must work with bulk operations
-    
-    // create Map<AccId, set<Contacts>>
-    Map<Id,List<Contact>> mapOfExisitingRecs = new Map<Id,List<Contact>>();
-    
-    // loop thru trigger.new and get accountIds
-    Set<Id> accIds = new Set<Id>();
-    for(Contact con : trigger.new){
-        if(con.Active__c == true){
-            accIds.add(con.AccountId);
+trigger ContactTrigger on Contact (after insert, after update, after delete) {
+     // use switch statement to switch between events
+     switch on Trigger.OperationType {
+         when  AFTER_INSERT{
+            // loop thru trigger.new for each contact
+            
+            Set<Id> accIds = new Set<Id>();                               
+            for (Contact con : trigger.new) {
+                accIds.add(con.AccountId); 
+            }
+            // Get the count of active contacts where their parent accounts are found in trigger.new
+            List<AggregateResult> results = [SELECT Active__c, AccountId, COUNT(ID) totalCount
+                                            FROM Contact 
+                                            WHERE Active__c = true
+                                            AND AccountId IN :accIds
+                                            GROUP BY Active__c, AccountId];
+            // if field active__c is not blank then do logic
+            // use aggregate query to count the number of contacts where active__c = true
+
+            // loop thru queryList
+            List<Account> accountsToUpdate = new List<Account>();
+            for (AggregateResult result : results) {
+                // get the accountId and totalCount
+                String accountId = (String)result.get('AccountId');
+                Integer totalActiveContacts = (Integer)result.get('totalCount');
+                // create new account instance and populate fields? Not query existing account?
+                Account accToUpdate = new Account(Id = accountId, Active_Contacts__c = totalActiveContacts);
+                accountsToUpdate.add(accToUpdate);  
+            }
+            // update account 
+            update accountsToUpdate;  
+         }
+         when AFTER_UPDATE {
+             
+        }
+        when AFTER_DELETE {
+             
         }
     }
-    // use accountIDs to get all related contacts
-    List<Contact> existingContacts = [SELECT Id, Name, AccountId, Active__c
-                                      FROM Contact
-                                      WHERE AccountId IN :accIds];
-    
-    //Integer totalContacts;
-    
-    // loop thru contact list of existing records to build Map
-    // for each contact, get the accountID and add to map and create new set
-    // get the accountID from Map and get all related contacts and add to map set
-    for(Contact con : existingContacts){
-        if(!mapOfExisitingRecs.containsKey(con.AccountId)){
-            mapOfExisitingRecs.put(con.AccountId, new List<Contact>());  
-        }
-        mapOfExisitingRecs.get(con.AccountId).add(con);
-        //totalContacts = mapOfExisitingRecs.get(con.AccountId).size();
-    }
-    
-    List<Account> accountsToUpdate = new List<Account>();
-    List<Account> existingAccs = [SELECT Id, Active_contacts__c
-                                  FROM Account
-                                  WHERE Id IN :accIds];
-    
-    // for each account update active_contacts with total count
-    for(Account acc : existingAccs){
-        if(mapOfExisitingRecs.containsKey(acc.Id) && mapOfExisitingRecs.values()){
-            acc.active_contacts__c ++;
-            //= (Integer)totalContacts;
-        } else {
-            acc.active_contacts__c --;  
-        }
-        accountsToUpdate.add(acc);
-    }
-    update accountsToUpdate;
 }
