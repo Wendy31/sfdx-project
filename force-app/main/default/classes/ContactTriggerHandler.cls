@@ -25,4 +25,24 @@ public class ContactTriggerHandler {
         AccountContactService.updateActiveContactsField(accIds);
     }
 
+    public static void afterDeleteHandler(List<Contact> oldContacts){ // only old records available since they are already deleted
+        Set<Id> accIds = new Set<Id>();                               
+            for (Contact con : oldContacts) {
+                if (String.isNotBlank(con.AccountId)) {
+                    accIds.add(con.AccountId); 
+                }  
+            }
+            AccountContactService.updateActiveContactsField(accIds);
+         }   
+
+    public static void afterUndeleteHandler(List<Contact> newContacts){
+        Set<Id> accIds = new Set<Id>();                               
+            for (Contact con : newContacts) {
+                if (String.isNotBlank(con.AccountId)) { // after undelete no need to check if checkbox has been changed. it retores original state first. any update will call update method above.
+                    accIds.add(con.AccountId);  
+                }  
+            }
+            AccountContactService.updateActiveContactsField(accIds);
+        }   
+
 }
