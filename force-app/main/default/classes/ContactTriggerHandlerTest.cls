@@ -1,15 +1,7 @@
 @isTest
 public with sharing class ContactTriggerHandlerTest {
-   /* @isTestData
-    public static void createTestData(){
-
-    } */
-
-    @isTest
-    public static void afterInsertHandlerTest() {
-        // create two accounts
-        // create related contacts: active and non active
-
+    @TestSetup
+    public static void makeData(){
         List<Account> accounts = new List<Account>();
         Account acc1 = new Account(Name = 'TestAccount1');
         Account acc2 = new Account(Name = 'TestAccount2');
@@ -18,144 +10,196 @@ public with sharing class ContactTriggerHandlerTest {
         insert accounts;
 
         List<Contact> contacts = new List<Contact>();
-        Contact con1 = new Contact(AccountId = acc1.Id, LastName = 'Abc', Active__c = True);
-        Contact con2 = new Contact(AccountId = acc1.Id, LastName = 'Abcd', Active__c = True);
-        Contact con3 = new Contact(AccountId = acc1.Id, LastName = 'Abcde');
-        Contact con4 = new Contact(AccountId = acc2.Id, LastName = 'Wxyz');
-        Contact con5 = new Contact(AccountId = acc2.Id, LastName = 'Xyz');
-        contacts.add(con1);
-        contacts.add(con2);
-        contacts.add(con3);
-        contacts.add(con4);
-        contacts.add(con5);
+        contacts.add(new Contact(AccountId = accounts[0].Id, LastName = 'Test Contact 1', Active__c = true));
+        contacts.add(new Contact(AccountId = accounts[0].Id, LastName = 'Test Contact 2', Active__c = true));
+        contacts.add(new Contact(AccountId = accounts[0].Id, LastName = 'Test Contact 3'));
+        contacts.add(new Contact(AccountId = accounts[0].Id, LastName = 'Test Contact 4'));
+        contacts.add(new Contact(AccountId = accounts[0].Id, LastName = 'Test Contact 5'));
         insert contacts;
+    } 
 
-        List<Account> exisitingAccounts = [SELECT Id, Active_Contacts__c
+    @isTest
+    public static void afterInsertHandlerTest2() {
+        // method to check accounts with and without active contacts
+        List<Account> exisitingAccounts = [SELECT Id, Name, Active_Contacts__c
+                                            FROM Account];
+        
+        // check total accounts
+        System.assertEquals(2, exisitingAccounts.size());
+        
+        // check active contacts per account
+        for (Account acc : exisitingAccounts) {
+            if (acc.Name == 'TestAccount1') {
+                System.assertEquals(2, acc.Active_Contacts__c);
+            } 
+            if (acc.Name == 'TestAccount2') {
+                System.assertEquals(null, acc.Active_Contacts__c);
+            } 
+        }
+
+        // check total contacts
+        List<Contact> existingContacts = [SELECT Id FROM Contact];
+        System.assertEquals(5, existingContacts.size());
+
+    }
+
+    @isTest
+    public static void afterInsertHandlerTestBulk() {
+        // method to check bulk insert of contact records
+
+        Account testAcc = [SELECT Id FROM Account WHERE Name = 'TestAccount1'];
+        List<Contact> contacts = new List<Contact>();
+        for (Integer i = 0; i < 1000; i++) {
+            contacts.add(new Contact(AccountId = testAcc.Id, LastName = 'TestCon '+i, Active__c = true));
+        }
+        
+        Test.startTest();
+        insert contacts;
+        Test.stopTest();
+
+        List<Account> exisitingAccounts = [SELECT Id, Account.Name, Active_Contacts__c
                                             FROM Account];
 
-        // check contacts list size per account
-        for (Contact con : contacts) {
-            if (con.Account.Name == 'TestAccount1') {
-                System.assertEquals(3, contacts.size());
-            } 
+         // check accounts
+         System.assertEquals(2, exisitingAccounts.size());
+         
+         for (Account acc : exisitingAccounts) {
+             if (acc.Name == 'TestAccount1') {
+                 System.assertEquals(1002, acc.Active_Contacts__c);
+             } 
+             if (acc.Name == 'TestAccount2') {
+                 System.assertEquals(null, acc.Active_Contacts__c);
+             } 
+         }
+ 
+         // check contacts
+         List<Contact> existingContacts = [SELECT Id FROM Contact];
+         System.assertEquals(1005, existingContacts.size());
+    }
 
-            if (con.Account.Name == 'TestAccount2') {
-                System.assertEquals(2, contacts.size());
+    @isTest
+    public static void afterUpdateHandlerTest1() {
+        // method to update contact active field
+
+        List<Contact> existingContacts = [SELECT Id, LastName, Active__c FROM Contact];
+        for (Contact con : existingContacts) {
+            if (con.LastName == 'Test Contact 3' || con.LastName == 'Test Contact 4') {
+                con.Active__c = true;
             } 
+        }
+        Test.startTest();
+        update existingContacts;
+        Test.stopTest();
+
+        List<Account> exisitingAccounts = [SELECT Id, Name, Active_Contacts__c
+                                            FROM Account];
+        
+        // check accounts
+        System.assertEquals(2, exisitingAccounts.size());
+         
+        for (Account acc : exisitingAccounts) {
+            if (acc.Name == 'TestAccount1') {
+                System.assertEquals(4, acc.Active_Contacts__c);
+            } 
+            if (acc.Name == 'TestAccount2') {
+                System.assertEquals(null, acc.Active_Contacts__c);
+            } 
+        }
+
+        // check contacts
+        System.assertEquals(5, existingContacts.size());
+    }
+
+    @isTest
+    public static void afterUpdateHandlerTest2() {
+        // re-parenting: AccountId changes on Contact
+        Account testAcc = [SELECT Id FROM Account WHERE Name = 'TestAccount2'];
+        List<Contact> existingContacts = [SELECT Id, LastName, Active__c FROM Contact];
+        for (Contact con : existingContacts) {
+            if (con.LastName == 'Test Contact 3') {
+                con.Active__c = true;
+                con.AccountId = testAcc.Id;
+            }
             
         }
-        // check account list size
-        System.assertEquals(2, accounts.size());
-        System.assertEquals(2, accounts[0].Active_Contacts__c);
-        System.assertEquals(null, accounts[1].Active_Contacts__c);
+        Test.startTest();
+        update existingContacts;
+        Test.stopTest();
+
+        List<Account> exisitingAccounts = [SELECT Id, Name, Active_Contacts__c
+                                            FROM Account];
+        
+        // check accounts
+        System.assertEquals(2, exisitingAccounts.size());
+         
+        for (Account acc : exisitingAccounts) {
+            if (acc.Name == 'TestAccount1') {
+                System.assertEquals(2, acc.Active_Contacts__c);
+            } 
+            if (acc.Name == 'TestAccount2') {
+                System.assertEquals(1, acc.Active_Contacts__c);
+            } 
+        }
+        // check contacts
+        System.assertEquals(5, existingContacts.size());
     }
 
     @isTest
-    public static void afterUpdateHandlerTest(){
-        List<Account> accounts = new List<Account>();
-        Account acc1 = new Account(Name = 'TestAccount1');
-        Account acc2 = new Account(Name = 'TestAccount2');
-        accounts.add(acc1);
-        accounts.add(acc2);
-        insert accounts;
-
-        List<Contact> contacts = new List<Contact>();
-        Contact con1 = new Contact(AccountId = acc1.Id, LastName = 'Abc', Active__c = True);
-        Contact con2 = new Contact(AccountId = acc1.Id, LastName = 'Abcd', Active__c = True);
-        Contact con3 = new Contact(AccountId = acc1.Id, LastName = 'Abcde');
-        Contact con4 = new Contact(AccountId = acc2.Id, LastName = 'Wxyz');
-        Contact con5 = new Contact(AccountId = acc2.Id, LastName = 'Xyz');
-        contacts.add(con1);
-        contacts.add(con2);
-        contacts.add(con3);
-        contacts.add(con4);
-        contacts.add(con5);
-        insert contacts;
-
-        List<Contact> existingContacts = [SELECT Id, Active__c, LastName, Account.Name
-                                            FROM Contact];
+    public static void afterDeleteHandlerTest() {
+        // re-parenting: AccountId changes on Contact
+        List <Contact> contactsToDelete = [SELECT Id FROM Contact WHERE Name IN ('Test Contact 1','Test Contact 5')];
         
-        for (Contact con : existingContacts) {
-            if (con.Account.Name == 'TestAccount1' && con.LastName == 'Abcde') {
-                con.Active__c = true;
-            }
-            update con;
-        } 
-        // check accounts' number of active contacts
-        System.assertEquals(3, accounts[0].Active_Contacts__c);
-        System.assertEquals(null, accounts[1].Active_Contacts__c);
+        Test.startTest();
+        Delete contactsToDelete;
+        Test.stopTest();
 
+        List <Contact> existingContacts = [SELECT Id FROM Contact];
+
+        List<Account> exisitingAccounts = [SELECT Id, Name, Active_Contacts__c
+                                            FROM Account];
+        
+        // check accounts
+        System.assertEquals(2, exisitingAccounts.size());
+         
+        for (Account acc : exisitingAccounts) {
+            if (acc.Name == 'TestAccount1') {
+                System.assertEquals(1, acc.Active_Contacts__c);
+            } 
+            if (acc.Name == 'TestAccount2') {
+                System.assertEquals(null, acc.Active_Contacts__c);
+            } 
+        }
+        // check contacts
+        System.assertEquals(3, existingContacts.size());
     }
 
     @isTest
-    public static void afterDeleteHandlerTest(){
-        List<Account> accounts = new List<Account>();
-        Account acc1 = new Account(Name = 'TestAccount1');
-        Account acc2 = new Account(Name = 'TestAccount2');
-        accounts.add(acc1);
-        accounts.add(acc2);
-        insert accounts;
+    public static void afterUndeleteHandlerTest() {
+        // re-parenting: AccountId changes on Contact
+        List <Contact> contactsToDelete = [SELECT Id FROM Contact WHERE Name IN ('Test Contact 1','Test Contact 5')];
+        delete contactsToDelete;
 
-        List<Contact> contacts = new List<Contact>();
-        Contact con1 = new Contact(AccountId = acc1.Id, LastName = 'Abc', Active__c = True);
-        Contact con2 = new Contact(AccountId = acc1.Id, LastName = 'Abcd', Active__c = True);
-        Contact con3 = new Contact(AccountId = acc1.Id, LastName = 'Abcde');
-        Contact con4 = new Contact(AccountId = acc2.Id, LastName = 'Wxyz');
-        Contact con5 = new Contact(AccountId = acc2.Id, LastName = 'Xyz');
-        contacts.add(con1);
-        contacts.add(con2);
-        contacts.add(con3);
-        contacts.add(con4);
-        contacts.add(con5);
-        insert contacts;
+        Test.startTest();
+        undelete contactsToDelete;
+        Test.stopTest();
+
+        List <Contact> existingContacts = [SELECT Id FROM Contact];
+
+        List<Account> exisitingAccounts = [SELECT Id, Name, Active_Contacts__c
+                                            FROM Account];
         
-        List<Contact> existingCons = [SELECT Id, LastName 
-                                    FROM Contact
-                                    WHERE LastName = 'Abc'];
-
-        delete existingCons;                     
-
-        // check accounts' number of active contacts
-        System.assertEquals(2, accounts[0].Active_Contacts__c);
-        System.assertEquals(null, accounts[1].Active_Contacts__c);
-
+        // check accounts
+        System.assertEquals(2, exisitingAccounts.size());
+         
+        for (Account acc : exisitingAccounts) {
+            if (acc.Name == 'TestAccount1') {
+                System.assertEquals(2, acc.Active_Contacts__c);
+            } 
+            if (acc.Name == 'TestAccount2') {
+                System.assertEquals(null, acc.Active_Contacts__c);
+            } 
+        }
+        // check contacts
+        System.assertEquals(5, existingContacts.size());
     }
-
-    
-    @isTest
-    public static void afterUndeleteHandlerTest(){
-        List<Account> accounts = new List<Account>();
-        Account acc1 = new Account(Name = 'TestAccount1');
-        Account acc2 = new Account(Name = 'TestAccount2');
-        accounts.add(acc1);
-        accounts.add(acc2);
-        insert accounts;
-
-        List<Contact> contacts = new List<Contact>();
-        Contact con1 = new Contact(AccountId = acc1.Id, LastName = 'Abc', Active__c = True);
-        Contact con2 = new Contact(AccountId = acc1.Id, LastName = 'Abcd', Active__c = True);
-        Contact con3 = new Contact(AccountId = acc1.Id, LastName = 'Abcde');
-        Contact con4 = new Contact(AccountId = acc2.Id, LastName = 'Wxyz');
-        Contact con5 = new Contact(AccountId = acc2.Id, LastName = 'Xyz');
-        contacts.add(con1);
-        contacts.add(con2);
-        contacts.add(con3);
-        contacts.add(con4);
-        contacts.add(con5);
-        insert contacts;
-        
-        List<Contact> existingCons = [SELECT Id, LastName 
-                                    FROM Contact
-                                    WHERE LastName = 'Abc'];
-
-        delete existingCons;  
-        
-        undelete existingCons;
-
-        // check accounts' number of active contacts
-        System.assertEquals(3, accounts[0].Active_Contacts__c);
-        System.assertEquals(null, accounts[1].Active_Contacts__c);
-    }
-
-
 }

@@ -17,7 +17,9 @@ public class ContactTriggerHandler {
             if (String.isNotBlank(con.AccountId) && oldContactsMap.get(con.Id).Active__c != con.Active__c) {
                 accIds.add(con.AccountId); 
                // capture both accounts if contact has updated its parent account to run logic on both the new account and old account 
-            }  else if (oldContactsMap.get(con.Id).AccountId != con.AccountId) {
+            }  
+            
+            if (oldContactsMap.get(con.Id).AccountId != con.AccountId) {
                 accIds.add(con.AccountId); 
                 accIds.add(oldContactsMap.get(con.Id).AccountId);   
             } 
