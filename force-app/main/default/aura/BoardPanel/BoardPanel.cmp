@@ -1,5 +1,5 @@
 <aura:component implements="flexipage:availableForAllPageTypes">
-    // delcare attributes (variables)
+    <!--delcare attributes (variables)-->
     <aura:attribute
         name="modes"
         type="List"
@@ -10,12 +10,25 @@
     ]"
     />
 
-    // create a card with a dropdown menu and two buttons 
+    <!--create a card with a dropdown menu and two buttons-->
     <lightning:card title="Word Shuffle">
-        <lightning:combobox name="gameMode" label="Game Mode" value="inProgress" placeholder="Select Game Mode" options="{! v.modes }" />
-
-        <lightning:button variant="brand" label="Start New Game" title="Start New Game" />
-
-        <lightning:button label="Reshuffle" title="Reshuffle" />
+        <lightning:layout horizontalAlign="center">
+            <lightning:layoutItem padding="around-small">
+                <lightning:combobox
+                    name="gameMode"
+                    label="Game Mode"
+                    value="inProgress"
+                    variant="label-hidden"
+                    placeholder="Select Game Mode"
+                    options="{! v.modes }"
+                />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small">
+                <lightning:button variant="brand" label="Start New Game" title="Start New Game" />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small">
+                <lightning:button label="Reshuffle" title="Reshuffle" />
+            </lightning:layoutItem>
+        </lightning:layout>
     </lightning:card>
 </aura:component>
