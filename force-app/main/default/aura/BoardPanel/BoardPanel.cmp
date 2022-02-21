@@ -24,10 +24,10 @@
                 />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <lightning:button variant="brand" label="Start New Game" title="Start New Game" />
+                <lightning:button variant="brand" label="Start New Game" title="Start New Game" onclick="{!c.startGame}" />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <lightning:button label="Reshuffle" title="Reshuffle" />
+                <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}"/>
             </lightning:layoutItem>
         </lightning:layout>
     </lightning:card>
