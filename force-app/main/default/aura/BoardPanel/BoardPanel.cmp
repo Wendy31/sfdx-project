@@ -10,11 +10,15 @@
     ]"
     />
 
-    <!--create a card with a dropdown menu and two buttons-->
+    <!--create attribute to store game mode from JS-->
+    <aura:attribute name="selectedMode" type="String"></aura:attribute>
+
+    <!--create a card with a combobox and two buttons-->
     <lightning:card title="Word Shuffle">
         <lightning:layout horizontalAlign="center">
             <lightning:layoutItem padding="around-small">
                 <lightning:combobox
+                    aura:id="gameMode"
                     name="gameMode"
                     label="Game Mode"
                     value="inProgress"
@@ -30,5 +34,12 @@
                 <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}"/>
             </lightning:layoutItem>
         </lightning:layout>
+
+        <!--Bound expression. Two way data binding-->
+        <p>The selected game mode is: {!v.selectedMode}</p>
+
+        <!--Unbound expression. One way data binding. Used when you dont expect data change in JS file as it wont reflect in HTML. Generally used in loops-->
+        <p>The selected game mode is: {#v.selectedMode}</p>
+
     </lightning:card>
 </aura:component>
