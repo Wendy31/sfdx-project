@@ -1,4 +1,8 @@
 <aura:component implements="flexipage:availableForAllPageTypes">
+
+<!--handle init event-->
+<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
     <lightning:layout multipleRows="true">
         <lightning:layoutItem size="4" padding="around-small"> 1 </lightning:layoutItem>
         <lightning:layoutItem size="4" padding="around-small"> 2 </lightning:layoutItem>
