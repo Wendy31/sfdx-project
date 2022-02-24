@@ -123,5 +123,12 @@
             randomArr[j] = temp;
         }
         return randomArr;
+    },
+
+    // method to get random index to find random WinWord
+    getWinWord : function (array) {
+        const randomIndex = Math.floor(Math.random() * array.length); 
+        return array[randomIndex];
+
     }
 });
