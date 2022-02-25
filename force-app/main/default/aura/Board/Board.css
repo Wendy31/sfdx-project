@@ -1,2 +1,11 @@
-.THIS {
+.THIS.board {
+    background-color: #f7fafc;
+    position: relative;
+
+}
+
+.THIS .win-word {
+    text-transform: capitalize;
+    font-weight: bold;
+    
 }
