@@ -26,5 +26,8 @@
         const winWord = helper.getWinWord(words);
         // set WinWord to cmp
         component.set("v.winWord", winWord);
+    },
+    doRender: function (component, event, helper) {
+        console.log("Render completed");
     }
-})
+});

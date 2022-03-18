@@ -11,7 +11,7 @@
     />
 
     <!--create attribute to store game mode from JS-->
-    <aura:attribute name="selectedMode" type="String"></aura:attribute>
+    <aura:attribute name="selectedMode" type="String" />
 
     <!--create a card with a combobox and two buttons-->
     <lightning:card title="Word Shuffle">
@@ -24,22 +24,27 @@
                     value="inProgress"
                     variant="label-hidden"
                     placeholder="Select Game Mode"
-                    options="{! v.modes }"
+                    options="{!v.modes}"
                 />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <lightning:button variant="brand" label="Start New Game" title="Start New Game" onclick="{!c.startGame}" />
+                <lightning:button
+                    aura:id="startNewGameButton"
+                    variant="brand"
+                    label="Start New Game"
+                    title="Start New Game"
+                    onclick="{!c.startGame}"
+                />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}"/>
+                <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}" />
             </lightning:layoutItem>
         </lightning:layout>
-
-        <!--Bound expression. Two way data binding-->
-        <p>The selected game mode is: {!v.selectedMode}</p>
-
-        <!--Unbound expression. One way data binding. Used when you dont expect data change in JS file as it wont reflect in HTML. Generally used in loops-->
-        <p>The selected game mode is: {#v.selectedMode}</p>
-
     </lightning:card>
+
+    <!--If selectedMode is not empty, then call the board (child) cmp-->
+    <aura:if isTrue="{!(v.selectedMode != null)}">
+        <c:Board mode="{!v.selectedMode}"></c:Board>
+        <aura:set attribute="else"> This is else </aura:set>
+    </aura:if>
 </aura:component>

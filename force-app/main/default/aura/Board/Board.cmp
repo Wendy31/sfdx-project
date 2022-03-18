@@ -14,8 +14,8 @@
                 <div class="slds-text-heading_medium">Word: <span class="win-word"> {!v.winWord} </span></div>
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <div class="slds-text-heading_medium">Remaining moves: {!(3-v.clickCount)}</div></lightning:layoutItem
-            >
+                <div class="slds-text-heading_medium">Remaining moves: {!(3-v.clickCount)}</div>
+            </lightning:layoutItem>
         </lightning:layout>
 
         <!--loop thru words list to create grid and print each word-->
