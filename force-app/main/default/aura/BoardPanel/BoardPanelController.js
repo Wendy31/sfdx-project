@@ -16,4 +16,4 @@
     reshuffleBoard : function(component, event, helper) {
         console.log("The shuffle board function is called");
     }
-})
+});

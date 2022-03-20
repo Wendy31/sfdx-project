@@ -18,13 +18,13 @@
         <lightning:layout horizontalAlign="center">
             <lightning:layoutItem padding="around-small">
                 <lightning:combobox
-                    aura:id="gameMode"
                     name="gameMode"
                     label="Game Mode"
                     value="inProgress"
                     variant="label-hidden"
-                    placeholder="Select Game Mode"
+                    aura:id="gameMode"
                     options="{!v.modes}"
+                    placeholder="Select Game Mode"
                 />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
@@ -42,7 +42,7 @@
         </lightning:layout>
     </lightning:card>
 
-    <!--If selectedMode is not empty, then call the board (child) cmp-->
+    <!--If selectedMode is not empty, then call the board (child) cmp to pass on selectedMode-->
     <aura:if isTrue="{!(v.selectedMode != null)}">
         <c:Board mode="{!v.selectedMode}"></c:Board>
         <aura:set attribute="else"> This is else </aura:set>
