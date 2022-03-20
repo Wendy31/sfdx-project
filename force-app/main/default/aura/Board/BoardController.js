@@ -29,5 +29,24 @@
     },
     doRender: function (component, event, helper) {
         console.log("Render completed");
+    },
+
+    blockClickHandler: function (component, event, helper) {
+        // handle event from blockController
+        // get the event value
+        let clickCount = component.get("v.clickCount") + 1;
+        const value = event.getParam("value");
+        if (value === component.get("v.winWord")) {
+            // user has won
+            component.set("v.result", "YOU WON")
+            console.log("User wins");
+        } else if (clickCount === 3) {
+            // user has lost
+            component.set("v.result", "YOU LOSE");
+            console.log("User loses");
+        } 
+
+        // update clickcount
+        component.set("v.clickCount", clickCount);
     }
 });

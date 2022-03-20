@@ -5,9 +5,12 @@
     <aura:attribute name="winWord" type="String" access="private" />
     <aura:attribute name="clickCount" type="Integer" default="0" access="private" />
     <aura:attribute name="blockSize" type="Integer" access="private" />
+    <aura:attribute name="result" type="String" />
 
-    <!--handle init event-->
+    <!--Handle init event-->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!--Handle BlockClickEvent-->
+    <!--<aura:handler name="onclick" event="c:BlockClickEvent" action="{!c.blockClickHandler}" />-->
 
     <div class="board">
         <lightning:layout>
@@ -22,7 +25,10 @@
         <!--loop thru words list to create grid and print each word-->
         <lightning:layout multipleRows="true">
             <aura:iteration items="{!v.words}" var="word">
-                <lightning:layoutItem size="{!v.blockSize}" padding="around-small"> {!word} </lightning:layoutItem>
+                <lightning:layoutItem size="{!v.blockSize}" padding="around-small">
+                    <c:Block label="{!word}" onclick="{!c.blockClickHandler}"></c:Block>
+                    <!--no need aura:handler, use event name (onclick) and call the handler method, handling the event -->
+                </lightning:layoutItem>
             </aura:iteration>
         </lightning:layout>
     </div>

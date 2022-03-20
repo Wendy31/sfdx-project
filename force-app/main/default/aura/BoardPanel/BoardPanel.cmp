@@ -15,7 +15,7 @@
 
     <!--create a card with a combobox and two buttons-->
     <lightning:card title="Word Shuffle">
-        <lightning:layout horizontalAlign="center">
+        <lightning:layout horizontalAlign="center" multipleRows="true">
             <lightning:layoutItem padding="around-small">
                 <lightning:combobox
                     name="gameMode"
@@ -39,12 +39,12 @@
             <lightning:layoutItem padding="around-small">
                 <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}" />
             </lightning:layoutItem>
+            <!--If selectedMode is not empty, then call the board (child) cmp to pass on selectedMode, else don't know layoutitem-->
+            <aura:if isTrue="{!(v.selectedMode != null)}">
+                <lightning:layoutItem size="12">
+                    <c:Board mode="{!v.selectedMode}"></c:Board>
+                </lightning:layoutItem>
+            </aura:if>
         </lightning:layout>
     </lightning:card>
-
-    <!--If selectedMode is not empty, then call the board (child) cmp to pass on selectedMode-->
-    <aura:if isTrue="{!(v.selectedMode != null)}">
-        <c:Board mode="{!v.selectedMode}"></c:Board>
-        <aura:set attribute="else"> This is else </aura:set>
-    </aura:if>
 </aura:component>
