@@ -42,7 +42,7 @@
             <!--If selectedMode is not empty, then call the board (child) cmp to pass on selectedMode, else don't know layoutitem-->
             <aura:if isTrue="{!(v.selectedMode != null)}">
                 <lightning:layoutItem size="12">
-                    <c:Board mode="{!v.selectedMode}"></c:Board>
+                    <c:Board aura:id="boardComp" mode="{!v.selectedMode}"></c:Board>
                 </lightning:layoutItem>
             </aura:if>
         </lightning:layout>

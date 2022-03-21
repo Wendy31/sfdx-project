@@ -26,6 +26,9 @@
         const winWord = helper.getWinWord(words);
         // set WinWord to cmp
         component.set("v.winWord", winWord);
+        // reset board for every Initialization
+        helper.resetBoard(component); 
+    
     },
     doRender: function (component, event, helper) {
         console.log("Render completed");
@@ -40,13 +43,16 @@
             // user has won
             component.set("v.result", "YOU WON")
             console.log("User wins");
+            helper.disableBoard(component); // sets diableBoard = true
         } else if (clickCount === 3) {
             // user has lost
             component.set("v.result", "YOU LOSE");
             console.log("User loses");
+            helper.disableBoard(component); 
         } 
 
         // update clickcount
         component.set("v.clickCount", clickCount);
     }
+
 });

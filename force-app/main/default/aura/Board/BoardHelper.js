@@ -129,6 +129,22 @@
     getWinWord : function (array) {
         const randomIndex = Math.floor(Math.random() * array.length); 
         return array[randomIndex];
+    },
 
+    disableBoard :function (component) {
+        component.set("v.disableBoard", true);
+    },
+
+    enableBoard :function (component) {
+        component.set("v.disableBoard", false);
+    },
+
+    resetBoard: function (component) {
+        // re-enableBoard to unblock board from layer 
+        this.enableBoard(component);
+        // reset remainingMoves
+        component.set("v.clickCount", 0);
+        // reset result
+        component.set("v.result", "");
     }
 });

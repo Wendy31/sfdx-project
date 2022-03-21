@@ -6,6 +6,15 @@
         // access value of combobox
         let selectedValue = gameModeComboBox.get("v.value");
 
+        // get selectedMode in case this value is already set from last game
+        const selectedMode = component.get("v.selectedMode");
+        // if selectedMode is not empty, then call aura:method to reInit page
+        if (selectedMode != null) {
+            const boardComp = component.find("boardComp"); // use find method to get aura id
+            // call aura method by using the boardComp and aura method name
+            boardComp.startGame();
+        }
+
         // update selectedMode attribute
         component.set("v.selectedMode", selectedValue);
 

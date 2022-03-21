@@ -5,12 +5,16 @@
     <aura:attribute name="winWord" type="String" access="private" />
     <aura:attribute name="clickCount" type="Integer" default="0" access="private" />
     <aura:attribute name="blockSize" type="Integer" access="private" />
-    <aura:attribute name="result" type="String" />
+    <aura:attribute name="result" type="String" access="private" />
+    <aura:attribute name="disableBoard" type="Boolean" default="false" access="private" />
 
     <!--Handle init event-->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <!--Handle BlockClickEvent-->
     <!--<aura:handler name="onclick" event="c:BlockClickEvent" action="{!c.blockClickHandler}" />-->
+
+    <!--Aura:Method to reinitialise the page when StartNewGame button is clicked hence calling doInit function again-->
+    <aura:method name="startGame" action="{!c.doInit}" description="Start New Game"> </aura:method>
 
     <div class="board">
         <lightning:layout>
@@ -18,9 +22,17 @@
                 <div class="slds-text-heading_medium">Word: <span class="win-word"> {!v.winWord} </span></div>
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
+                <div class="slds-text-heading_medium">{!v.result}</div>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small">
                 <div class="slds-text-heading_medium">Remaining moves: {!(3-v.clickCount)}</div>
             </lightning:layoutItem>
         </lightning:layout>
+
+        <!--If disableBoard = true then show Layer on top to prevent user from clicking on it-->
+        <aura:if isTrue="{!v.disableBoard}">
+            <div class="board-disabled"></div>
+        </aura:if>
 
         <!--loop thru words list to create grid and print each word-->
         <lightning:layout multipleRows="true">
