@@ -13,10 +13,11 @@
         compEvent.setParams({value : label}); // takes label attribute from CMP and assigns to Event's value attribute 
         compEvent.fire();
         }
+    },
 
-        
-
-
-
+    scriptsLoaded : function(component) {
+        // do post processing after external JS script is loaded
+        // call FitText method and pass in the div element (of the block tiles) you want the text to fit in
+        fitText(component.getElement(".board-block"));
     }
 })

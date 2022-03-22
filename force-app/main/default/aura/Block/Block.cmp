@@ -2,6 +2,10 @@
     <aura:attribute name="label" type="String" />
     <aura:attribute name="open" type="Boolean" default="false" />
 
+    <!--Use external JS library to ensure text in the blocks tiles responsive-->
+    <!--Static resource contains external JS file and called by controller-->
+    <ltng:require scripts="{!$Resource.FitText}" afterScriptsLoaded="{!c.scriptsLoaded}" />
+
     <!--Register the blockClickEvent-->
     <aura:registerEvent name="onclick" type="c:BlockClickEvent" />
 
