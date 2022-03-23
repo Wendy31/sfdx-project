@@ -24,5 +24,15 @@
 
     reshuffleBoard : function(component, event, helper) {
         console.log("The shuffle board function is called");
+    },
+
+    // handles app event, when player wins or loses will disable or enable reshuffle button
+    onResultHandler : function (component, event) {
+        const result = event.getParam("result");
+        if(result === "win"){
+            component.set("v.reshuffleDisabled", true);
+        } else {
+            component.set("v.reshuffleDisabled", false);
+        }  
     }
 });

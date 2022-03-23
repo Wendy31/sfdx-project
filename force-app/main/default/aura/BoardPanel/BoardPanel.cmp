@@ -12,6 +12,9 @@
 
     <!--create attribute to store game mode from JS-->
     <aura:attribute name="selectedMode" type="String" />
+    <aura:attribute name="reshuffleDisabled" type="Boolean" default="true" />
+
+    <aura:handler event="c:ResultApplicationEvent" action="{!c.onResultHandler}" />
 
     <!--create a card with a combobox and two buttons-->
     <lightning:card title="Word Shuffle">
@@ -37,7 +40,7 @@
                 />
             </lightning:layoutItem>
             <lightning:layoutItem padding="around-small">
-                <lightning:button label="Reshuffle" title="Reshuffle" onclick="{!c.reshuffleBoard}" />
+                <lightning:button label="Reshuffle" title="Reshuffle" disabled="{!v.reshuffleDisabled}" onclick="{!c.reshuffleBoard}" />
             </lightning:layoutItem>
             <!--If selectedMode is not empty, then call the board (child) cmp to pass on selectedMode, else don't know layoutitem-->
             <aura:if isTrue="{!(v.selectedMode != null)}">

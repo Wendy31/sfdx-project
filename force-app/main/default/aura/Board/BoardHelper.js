@@ -146,5 +146,13 @@
         component.set("v.clickCount", 0);
         // reset result
         component.set("v.result", "");
+    },
+
+    fireResultEvent : function (resultValue) {
+        // get event
+       const appEvent = $A.get("e.c:ResultApplicationEvent");
+       // set result to event
+       appEvent.setParams({result : resultValue}); // set value to JSON object
+       appEvent.fire();
     }
 });

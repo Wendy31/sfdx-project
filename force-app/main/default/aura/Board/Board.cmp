@@ -16,6 +16,9 @@
     <!--Aura:Method to reinitialise the page when StartNewGame button is clicked hence calling doInit function again-->
     <aura:method name="startGame" action="{!c.doInit}" description="Start New Game"> </aura:method>
 
+    <!--Register the ResultApplicationEvent-->
+    <aura:registerEvent name="appEvent" type="c:ResultApplicationEvent" />
+
     <div class="board">
         <lightning:layout>
             <lightning:layoutItem padding="around-small">

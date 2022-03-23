@@ -44,11 +44,13 @@
             component.set("v.result", "YOU WON")
             console.log("User wins");
             helper.disableBoard(component); // sets diableBoard = true
+            helper.fireResultEvent("win"); // app event fires whenever user wins or loses a game
         } else if (clickCount === 3) {
             // user has lost
             component.set("v.result", "YOU LOSE");
             console.log("User loses");
-            helper.disableBoard(component); 
+            helper.disableBoard(component);
+            helper.fireResultEvent("lose"); 
         } 
 
         // update clickcount
