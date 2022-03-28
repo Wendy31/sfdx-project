@@ -12,7 +12,7 @@
         let compEvent = component.getEvent("onclick");
         compEvent.setParams({value : label}); // takes label attribute from CMP and assigns to Event's value attribute 
         compEvent.fire();
-        }
+        } 
     },
 
     scriptsLoaded : function(component) {

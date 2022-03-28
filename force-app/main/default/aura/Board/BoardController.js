@@ -55,6 +55,13 @@
 
         // update clickcount
         component.set("v.clickCount", clickCount);
-    }
+    },
+    reshuffleBoard : function(component, event, helper) {
+        const words = event.getParam("words");
+        event.randomiseArray(words);
+        component.set("words", words);
+        event.re
+        console.log("The shuffle board function is called");
+    },
 
 });
