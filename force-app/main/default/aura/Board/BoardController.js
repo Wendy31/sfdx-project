@@ -1,5 +1,5 @@
 ({
-    doInit : function(component, event, helper) {
+    doInit: function (component, event, helper) {
         console.log("Initialization completed");
 
         // set number of columns based on game mode
@@ -14,7 +14,7 @@
         }
 
         // set block size based on column
-        let blockSize = 12/ column;
+        let blockSize = 12 / column;
         component.set("v.blockSize", blockSize);
 
         // get list of words from helper file
@@ -27,8 +27,8 @@
         // set WinWord to cmp
         component.set("v.winWord", winWord);
         // reset board for every Initialization
-        helper.resetBoard(component); 
-    
+        helper.resetBoard(component);
+
     },
     doRender: function (component, event, helper) {
         console.log("Render completed");
@@ -50,18 +50,17 @@
             component.set("v.result", "YOU LOSE");
             console.log("User loses");
             helper.disableBoard(component);
-            helper.fireResultEvent("lose"); 
-        } 
+            helper.fireResultEvent("lose");
+        }
 
         // update clickcount
         component.set("v.clickCount", clickCount);
     },
-    reshuffleBoard : function(component, event, helper) {
-        const words = event.getParam("words");
-        event.randomiseArray(words);
-        component.set("words", words);
-        event.re
-        console.log("The shuffle board function is called");
+    reshuffleBoard: function (component, event, helper) {
+        const words = component.get("v.words");
+        const randomisedWords = helper.randomiseArray(words);
+        component.set("v.words", randomisedWords);
+        helper.resetBoard(component);
     },
 
 });

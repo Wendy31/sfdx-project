@@ -15,6 +15,8 @@
 
     <!--Aura:Method to reinitialise the page when StartNewGame button is clicked hence calling doInit function again-->
     <aura:method name="startGame" action="{!c.doInit}" description="Start New Game"> </aura:method>
+    <!--Aura:Method will be called by Parent BoardPanel to reshuffle board-->
+    <aura:method name="reshuffleBoard" action="{!c.reshuffleBoard}" description="Reshuffle Board"> </aura:method>
 
     <!--Register the ResultApplicationEvent-->
     <aura:registerEvent name="appEvent" type="c:ResultApplicationEvent" />

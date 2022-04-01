@@ -1,5 +1,5 @@
 ({
-    startGame : function(component, event, helper) {
+    startGame: function (component, event, helper) {
         // access combobox
         let gameModeComboBox = component.find("gameMode");
 
@@ -22,18 +22,20 @@
         console.log("The selected Game Mode is: " + component.get("v.selectedMode"));
     },
 
-    reshuffleBoard : function(component, event, helper) {
-       
-        console.log("The shuffle board function is called");
+    reshuffleBoard: function (component, event, helper) {
+        // find boardComp, then call child reshuffleBoard method from aura:id boardComp  that connects parent to child
+        const boardComp = component.find("boardComp");
+        boardComp.reshuffleBoard();
+        component.set("v.reshuffleDisabled", true);
     },
 
     // handles app event, when player wins or loses will disable or enable reshuffle button
-    onResultHandler : function (component, event) {
+    onResultHandler: function (component, event) {
         const result = event.getParam("result");
-        if(result === "win"){
+        if (result === "win") {
             component.set("v.reshuffleDisabled", true);
         } else {
             component.set("v.reshuffleDisabled", false);
-        }  
+        }
     }
 });
