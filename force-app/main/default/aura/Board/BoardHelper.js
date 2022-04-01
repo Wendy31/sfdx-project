@@ -1,8 +1,8 @@
 ({
     getWords: function (count) {
-        if (count > 100){
+        if (count > 100) {
             return; // more than 100, then do nothing
-        } 
+        }
         // build array of 100 words
         let wordsArray = [
             "expansion",
@@ -108,9 +108,17 @@
         ];
         // randomise array
         wordsArray = this.randomiseArray(wordsArray);
+        // convert array of strings to array of objects, to add property 'open' to each word
+        // open attribute will be false by default, until the tiles are clicked then open = true (see block.cmp)
+        const wordObjArray = wordsArray.map((element) => {
+            return {
+                word: element,
+                open: false
+            };
+        });
 
         // return the requested words
-        return wordsArray.slice(0, count);
+        return wordObjArray.slice(0, count);
     },
     // shuffle the array list to get a random result of words returned
     randomiseArray: function (array) {
@@ -126,16 +134,16 @@
     },
 
     // method to get random index to find random WinWord
-    getWinWord : function (array) {
-        const randomIndex = Math.floor(Math.random() * array.length); 
-        return array[randomIndex];
+    getWinWord: function (array) {
+        const randomIndex = Math.floor(Math.random() * array.length);
+        return array[randomIndex].word;
     },
 
-    disableBoard :function (component) {
+    disableBoard: function (component) {
         component.set("v.disableBoard", true);
     },
 
-    enableBoard :function (component) {
+    enableBoard: function (component) {
         component.set("v.disableBoard", false);
     },
 
@@ -148,11 +156,13 @@
         component.set("v.result", "");
     },
 
-    fireResultEvent : function (resultValue) {
+    fireResultEvent: function (resultValue) {
         // get event
-       const appEvent = $A.get("e.c:ResultApplicationEvent");
-       // set result to event
-       appEvent.setParams({result : resultValue}); // set value to JSON object
-       appEvent.fire();
+        const appEvent = $A.get("e.c:ResultApplicationEvent");
+        // set result to event
+        appEvent.setParams({
+            result: resultValue
+        }); // set value to JSON object
+        appEvent.fire();
     }
 });

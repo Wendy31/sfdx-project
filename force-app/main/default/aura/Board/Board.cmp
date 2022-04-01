@@ -39,11 +39,11 @@
             <div class="board-disabled"></div>
         </aura:if>
 
-        <!--loop thru words list to create grid and print each word-->
+        <!--loop thru words object array to create grid and print each word, along with their 'open' attribute-->
         <lightning:layout multipleRows="true">
-            <aura:iteration items="{!v.words}" var="word">
+            <aura:iteration items="{!v.words}" var="wordObj">
                 <lightning:layoutItem size="{!v.blockSize}" padding="around-small">
-                    <c:Block label="{!word}" onclick="{!c.blockClickHandler}"></c:Block>
+                    <c:Block label="{!wordObj.word}" open="{!wordObj.open}" onclick="{!c.blockClickHandler}"></c:Block>
                     <!--no need aura:handler, use event name (onclick) and call the handler method, handling the event -->
                 </lightning:layoutItem>
             </aura:iteration>
