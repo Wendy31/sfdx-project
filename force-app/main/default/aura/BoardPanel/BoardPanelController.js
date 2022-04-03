@@ -30,12 +30,14 @@
     },
 
     // handles app event, when player wins or loses will disable or enable reshuffle button
-    onResultHandler: function (component, event) {
+    onResultHandler: function (component, event, helper) {
         const result = event.getParam("result");
         if (result === "win") {
             component.set("v.reshuffleDisabled", true);
         } else {
             component.set("v.reshuffleDisabled", false);
         }
+        // call apex method via helper file
+        helper.addResultRecord(component, result);
     }
 });
