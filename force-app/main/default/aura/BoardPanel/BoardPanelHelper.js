@@ -19,5 +19,15 @@
         });
         // call apex method (action). Action is added to a queue 
         $A.enqueueAction(action);
+    },
+
+    showToast: function (titleValue, msgValue, typeValue) {
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            "title": titleValue,
+            "message": msgValue,
+            "type": typeValue
+        });
+        toastEvent.fire();
     }
 })
