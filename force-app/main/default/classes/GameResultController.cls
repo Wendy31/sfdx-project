@@ -1,6 +1,6 @@
 public with sharing class GameResultController {
     @AuraEnabled
-    public static List<Word_Shuffle__c> getResult() {
+    public static List<Word_Shuffle__c> getResults() {
         String userId = UserInfo.getUserId();
         List<Word_Shuffle__c> results = [
             SELECT Id, Name, Result__c, Mode__c, CreatedDate

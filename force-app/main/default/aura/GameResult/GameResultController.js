@@ -27,9 +27,9 @@
         helper.fetchResult(component);
     },
 
-    onResultHandler: function (component) {
+    onResultHandler: function (component, helper) {
         // make another server side call and fetch latest results from APEX method 
         // datatable will reload with fresh results 
         helper.fetchResult(component);
     }
-})
+});

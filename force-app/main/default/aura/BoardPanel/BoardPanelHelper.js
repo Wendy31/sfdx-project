@@ -12,9 +12,9 @@
         });
         // set call back that executes after server-side action returns a response 
         action.setCallback(this, function (response) {
-            const state = response.state();
-            if (state !== "SUCCESS") {
-                console.log("Error in saving record: " + response.getReturnValue());
+            const state = response.getState();
+            if (state != "SUCCESS") {
+                console.log("Error in saving record: ");
             }
         });
         // call apex method (action). Action is added to a queue 

@@ -1,7 +1,7 @@
 ({
     fetchResult: function (component) {
         // method to call APEX method to get result from backend
-        const action = component.get("c.getResult");
+        const action = component.get("c.getResults");
         action.setCallback(this, function (response) {
             const state = response.getState();
             if (state === "SUCCESS") {
