@@ -1,5 +1,6 @@
 public with sharing class ProductController {
     // Create new Products: Create MTO yearly subscriptions with ProductCode _1Y
+    // https://horecadigital.atlassian.net/browse/SFDC-9733
     /*
     Create copies of the following products:
 
@@ -90,9 +91,243 @@ Bring to all lower envs by deployment. Bring to Prod only on final release aroun
     */
     public ProductController() {
         // 1. Script to create products
+        /*List<String> productCodes = new List<String>{
+            'MTO_MTOProfessional','MTO_MTOProfessionalSetup', 'MTO_MTOProfOrder','MTO_MTOProfOrderSetup', 'MTO_MTOPremium', 'MTO_MTOPremiumSetup'
+        };
+        
+        List<Product2> productsToInsert = new List<Product2>();
+        
+        List<Product2> productsToClone = [
+                SELECT Id, Name, ProductCode, ExcludeAddProducts__c, AddProducts__c, Available_on_Order__c, BillingType__c, Contact_for_Second_Level_Support__c, CurrencyIsoCode, DefaultPeriod__c, Downgradeable__c, External_Product_ID__c, External_URL__c, Family, Full_Description_DE__c, Full_Description_EN__c, Full_Description_FR__c, Google_Rating__c, GraceTimeDaysUnpaid__c, Is_Product_Expiring__c, IsBundle__c, IsDISHProduct__c, IsHDPayProduct__c, IsOdooProduct__c, IsSetupProduct__c, OnboardingFamily__c, OnGraceTime__c, Partner__c, Payment_Frequency__c, PaymentType__c, Product_Domain__c, Product_Owner__c, ProductFamily__c, RecordTypeId, Recurring_Times__c, Sales_Material_URL__c, Short_Description_DE__c, Short_Description_EN__c, Short_Description_FR__c, ShowOnInvoices__c, Startup__c, Technical_Description_DE__c, Technical_Description_EN__c, Technical_Description_FR__c, Tier__c, Tools__c, Total_Nr_of_Customers__c, Unsubscribeable__c  
+                FROM Product2 
+                WHERE ProductCode IN: productCodes];
+        for (Product2 p : productsToClone) {
+          Product2 tempProduct = p.clone(false, true, false, false);
+          tempProduct.ProductCode = p.ProductCode + '_1Y';
+          tempProduct.DefaultPeriod__c = 'Yearly';
+          tempProduct.Name = p.Name + ' (1 Year)';
+          tempProduct.AddProducts__c = String.isNotBlank(p.AddProducts__c) && p.AddProducts__c.contains('Setup') ? p.AddProducts__c + '_1Y' : '';
+          if (String.isNotBlank(p.ExcludeAddProducts__c)) {
+            List<String> excludeAddProducts = p.ExcludeAddProducts__c?.split(';');
+            List<String> newExcludedProducts = new List<String>();
+            for (String ex : excludeAddProducts) {
+                if (productCodes.contains(ex)) {
+                  newExcludedProducts.add(ex + '_1Y');
+                }
+            }
+            tempProduct.ExcludeAddProducts__c = newExcludedProducts.isEmpty() ? 
+                    p.ExcludeAddProducts__c :  
+                    p.ExcludeAddProducts__c + ';' + String.join(newExcludedProducts, ';');
+            
+            p.ExcludeAddProducts__c = tempProduct.ExcludeAddProducts__c;
+            productsToInsert.add(p);
+          }
+          
+          productsToInsert.add(tempProduct);
+        }
+        
+        upsert productsToInsert;
+        */
+
         // 2. Script to insert Standard PBE
-        // 3. Script to add new PBE for Pricebooks for specific countries.
+        /*
+        Map<String, Product2> newProductByCode = new Map<String, Product2>();
+
+List<String> newProductCodes = new List<String>{
+        'MTO_MTOProfessional_1Y','MTO_MTOProfessionalSetup_1Y',
+        'MTO_MTOProfOrder_1Y','MTO_MTOProfOrderSetup_1Y', 'MTO_MTOPremium_1Y',
+        'MTO_MTOPremiumSetup_1Y'};
+
+List<Product2> newProducts = [SELECT Id, ProductCode FROM Product2 WHERE ProductCode IN: newProductCodes];
+for (Product2 p : newProducts) {
+    newProductByCode.put(p.ProductCode, p);
+}
+
+List<String> productCodes = new List<String>{
+        'MTO_MTOProfessional','MTO_MTOProfessionalSetup', 'MTO_MTOProfOrder',
+        'MTO_MTOProfOrderSetup', 'MTO_MTOPremium', 'MTO_MTOPremiumSetup'};
+
+List<PricebookEntry> pbEntries = [
+        SELECT Id, Pricebook2Id, Product2Id, ProductCode, UnitPrice, 
+          VATPercent__c, ActivateWithoutPayment__c, ChargeOnOrder__c, 
+          Not_For_Call_Center__c, Payment_Methods__c, PaymentSchedule__c, 
+          RecurringPaymentEnabled__c, TransactionType__c, Product_Name_Invoice__c, 
+          ProductType__c, IsActive, CurrencyIsoCode, DowngradeWithoutPayment__c, 
+          EndOfTrialPeriod__c 
+        FROM PricebookEntry 
+        WHERE ProductCode IN : productCodes AND Pricebook2.IsStandard = TRUE];
+
+List<PricebookEntry> newPBEntries = new List<PricebookEntry>();
+for (PricebookEntry pbe : pbEntries) {
+    if (productCodes.contains(pbe.ProductCode)) {
+        PricebookEntry tempPBE = new PricebookEntry();
+        tempPBE.Pricebook2Id = pbe.Pricebook2Id;
+        tempPBE.Product2Id = newProductByCode.get(pbe.ProductCode + '_1Y').Id;
+        tempPBE.UnitPrice = 0;
+        tempPBE.VATPercent__c = 21;
+        tempPBE.ActivateWithoutPayment__c = pbe.ActivateWithoutPayment__c;
+        tempPBE.ChargeOnOrder__c = true;
+        tempPBE.Not_For_Call_Center__c = pbe.Not_For_Call_Center__c;
+        tempPBE.Payment_Methods__c = pbe.Payment_Methods__c;
+        tempPBE.PaymentSchedule__c = pbe.PaymentSchedule__c;
+        tempPBE.RecurringPaymentEnabled__c = pbe.RecurringPaymentEnabled__c;
+        tempPBE.TransactionType__c = pbe.TransactionType__c;
+        tempPBE.Product_Name_Invoice__c = String.isNotBlank(pbe.Product_Name_Invoice__c) ? pbe.Product_Name_Invoice__c + ' (12 Months)' : '';
+        tempPBE.ProductType__c = pbe.ProductType__c;
+        tempPBE.IsActive = true;
+        tempPBE.CurrencyIsoCode = pbe.CurrencyIsoCode;
+        
+        newPBEntries.add(tempPBE);
+    }
+}
+insert newPBEntries;
+        */
+
+        // 3. Script to add new PBE for Pricebooks for specific countries
+        /*
+        Map<String, Product2> newProductByCode = new Map<String, Product2>();
+
+List<String> newProductCodes = new List<String>{
+        'MTO_MTOProfessional_1Y','MTO_MTOProfessionalSetup_1Y',
+        'MTO_MTOProfOrder_1Y','MTO_MTOProfOrderSetup_1Y', 'MTO_MTOPremium_1Y',
+        'MTO_MTOPremiumSetup_1Y'};
+
+List<Product2> newProducts = [SELECT Id, ProductCode FROM Product2 WHERE ProductCode IN: newProductCodes];
+for (Product2 p : newProducts) {
+    newProductByCode.put(p.ProductCode, p);
+}
+
+List<String> countryCodes = new List<String>{
+        'ES', 'DE', 'FR', 'IT', 'PL', 'HU', 'RO'
+};
+
+List<String> productCodes = new List<String>{
+        'MTO_MTOProfessional','MTO_MTOProfessionalSetup', 'MTO_MTOProfOrder',
+        'MTO_MTOProfOrderSetup', 'MTO_MTOPremium', 'MTO_MTOPremiumSetup'};
+
+List<PricebookEntry> pbEntries = [
+        SELECT Id, Pricebook2Id, Product2Id, ProductCode, UnitPrice, 
+          VATPercent__c, ActivateWithoutPayment__c, ChargeOnOrder__c, 
+          Not_For_Call_Center__c, Payment_Methods__c, PaymentSchedule__c, 
+          RecurringPaymentEnabled__c, TransactionType__c, Product_Name_Invoice__c, 
+          ProductType__c, IsActive, CurrencyIsoCode, DowngradeWithoutPayment__c, 
+          EndOfTrialPeriod__c 
+        FROM PricebookEntry 
+        WHERE ProductCode IN : productCodes AND Pricebook2.Country__r.Country_Code__c IN : countryCodes];
+
+List<PricebookEntry> newPBEntries = new List<PricebookEntry>();
+for (PricebookEntry pbe : pbEntries) {
+    if (productCodes.contains(pbe.ProductCode)) {
+        PricebookEntry tempPBE = new PricebookEntry();
+        tempPBE.Pricebook2Id = pbe.Pricebook2Id;
+        tempPBE.Product2Id = newProductByCode.get(pbe.ProductCode + '_1Y').Id;
+        tempPBE.UnitPrice = pbe.UnitPrice;
+        tempPBE.VATPercent__c = pbe.VATPercent__c;
+        tempPBE.ActivateWithoutPayment__c = pbe.ActivateWithoutPayment__c;
+        tempPBE.ChargeOnOrder__c = true;
+        tempPBE.Not_For_Call_Center__c = pbe.Not_For_Call_Center__c;
+        tempPBE.Payment_Methods__c = pbe.Payment_Methods__c;
+        tempPBE.PaymentSchedule__c = pbe.PaymentSchedule__c;
+        tempPBE.RecurringPaymentEnabled__c = pbe.RecurringPaymentEnabled__c;
+        tempPBE.TransactionType__c = pbe.TransactionType__c;
+        tempPBE.Product_Name_Invoice__c = String.isNotBlank(pbe.Product_Name_Invoice__c) ? pbe.Product_Name_Invoice__c + ' (12 Months)' : '';
+        tempPBE.ProductType__c = pbe.ProductType__c;
+        tempPBE.IsActive = true;
+        tempPBE.CurrencyIsoCode = pbe.CurrencyIsoCode;
+        
+        newPBEntries.add(tempPBE);
+    }
+}
+insert newPBEntries;
+
+        */
+
         // 4. Script to insert MerchantCapability
+        /*
+        Map<String, Product2> newProductByCode = new Map<String, Product2>();
+
+List<String> newProductCodes = new List<String>{
+        'MTO_MTOProfessional_1Y','MTO_MTOProfessionalSetup_1Y',
+        'MTO_MTOProfOrder_1Y','MTO_MTOProfOrderSetup_1Y', 'MTO_MTOPremium_1Y',
+        'MTO_MTOPremiumSetup_1Y'};
+
+List<Product2> newProducts = [SELECT Id, ProductCode FROM Product2 WHERE ProductCode IN: newProductCodes];
+for (Product2 p : newProducts) {
+    newProductByCode.put(p.ProductCode, p);
+}
+
+List<String> countryCodes = new List<String>{
+        'ES', 'DE', 'FR', 'IT', 'PL', 'HU', 'RO'
+};
+
+List<String> resellerMerchantNames = new List<String>{
+        'HD', 'MCCES', 'MCCDE', 'MCCFR', 'MCCIT', 'MCCPL', 'MCCHU', 'MCCRO'
+};
+
+List<String> productCodes = new List<String>{
+        'MTO_MTOProfessional','MTO_MTOProfessionalSetup', 'MTO_MTOProfOrder',
+        'MTO_MTOProfOrderSetup', 'MTO_MTOPremium', 'MTO_MTOPremiumSetup'};
+
+
+List<MerchantCapability__c> mcList = [SELECT Country__c, Product__r.ProductCode, OneTimeChargeDeferral__c, SkipPayment__c, Country__r.Name, ResellerMerchant__c, ResellerMerchant__r.Name, TrialMonths__c, TrialMonthsCharge__c FROM MerchantCapability__c WHERE Country__r.Country_Code__c IN : countryCodes AND Product__r.ProductCode IN : productCodes AND ResellerMerchant__r.Name IN : resellerMerchantNames];
+
+List<MerchantCapability__c> mcToInsert = new List<MerchantCapability__c>();
+for (MerchantCapability__c mc : mcList) {
+    MerchantCapability__c tempMC = new MerchantCapability__c();
+    tempMC.ResellerMerchant__c = mc.ResellerMerchant__c;
+    tempMC.Country__c = mc.Country__c;
+    tempMC.TrialMonths__c = mc.TrialMonths__c;
+    tempMC.TrialMonthsCharge__c = mc.TrialMonthsCharge__c;
+    tempMC.OneTimeChargeDeferral__c = mc.OneTimeChargeDeferral__c;
+    tempMC.Product__c = newProductByCode.get(mc.Product__r.ProductCode + '_1Y').Id;
+    tempMC.Name = mc.ResellerMerchant__r.Name + ' ' + mc.Country__r.Name + ' ' + mc.Product__r.ProductCode + '_1Y';
+
+    mcToInsert.add(tempMC);
+}
+insert mcToInsert;
+
+        */
+
         // 5. Script to insert ResellerCapability
+
+        /*
+        Map<String, Product2> newProductByCode = new Map<String, Product2>();
+
+List<String> newProductCodes = new List<String>{
+        'MTO_MTOProfessional_1Y','MTO_MTOProfessionalSetup_1Y',
+        'MTO_MTOProfOrder_1Y','MTO_MTOProfOrderSetup_1Y', 'MTO_MTOPremium_1Y',
+        'MTO_MTOPremiumSetup_1Y'};
+
+List<Product2> newProducts = [SELECT Id, ProductCode FROM Product2 WHERE ProductCode IN: newProductCodes];
+for (Product2 p : newProducts) {
+    newProductByCode.put(p.ProductCode, p);
+}
+
+List<String> countryCodes = new List<String>{
+        'ES', 'DE', 'FR', 'IT', 'PL', 'HU', 'RO'
+};
+
+List<String> resellerMerchantNames = new List<String>{
+        'HD', 'MCCES', 'MCCDE', 'MCCFR', 'MCCIT', 'MCCPL', 'MCCHU', 'MCCRO'
+};
+
+List<String> productCodes = new List<String>{
+        'MTO_MTOProfessional','MTO_MTOProfessionalSetup', 'MTO_MTOProfOrder',
+        'MTO_MTOProfOrderSetup', 'MTO_MTOPremium', 'MTO_MTOPremiumSetup'};
+
+
+List<ResellerCapability__c> rcList = [SELECT Reseller__c, Reseller__r.Name, Product__c, Project__c, Country__r.Name, Reseller_Merchant__c, Product__r.ProductCode, Reseller_Merchant__r.Name, VATMandatory__c, METROIDMandatory__c FROM ResellerCapability__c WHERE Country__r.Country_Code__c IN : countryCodes AND Product__r.ProductCode IN : productCodes AND Reseller__r.Name IN : resellerMerchantNames];
+
+List<ResellerCapability__c> rcToInsert = new List<ResellerCapability__c>();
+for (ResellerCapability__c rc : rcList) {
+    ResellerCapability__c tempRC = rc.clone(false, true);
+    tempRC.Product__c = newProductByCode.get(rc.Product__r.ProductCode + '_1Y').Id;
+    tempRC.Name = rc.Reseller__r.Name + ' ' + rc.Country__r.Name + ' ' + rc.Product__r.ProductCode + '_1Y';
+    
+    rcToInsert.add(tempRC);
+}
+insert rcToInsert;
+
+         */
     }
 }
