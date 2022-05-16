@@ -7,4 +7,5 @@ trigger LazyEmployee on Case(before insert) {
         newCases.add(a);
     }
     insert newCases;
+    // complete 2moro
 }
