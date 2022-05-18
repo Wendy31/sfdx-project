@@ -1,11 +1,8 @@
 // This lazy dude wrote code to auto-accept and close all cases!
 trigger LazyEmployee on Case(before insert) {
-    List<Case> newCases = new List<Case>();
-    for (Case a : Trigger.new) {
-        a.Status = 'Closed';
-        a.Owner = 'David Liu';
-        newCases.add(a);
+    // no need new list since it's a before trigger
+    for (Case newCase : Trigger.new) {
+        newCase.Status = 'Closed';
+        newCase.OwnerId = 'D0050E000004vXORQA2';
     }
-    insert newCases;
-    // complete 2moro
 }
