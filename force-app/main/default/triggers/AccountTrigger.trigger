@@ -8,7 +8,7 @@ trigger GetRival on Account (after insert, after update) {
     List<Rival__c> rivals = new List<Rival__c>();
     for (Account acc : Trigger.old) {
   
-      // Rival__c is a lookup to the Rival custom object
+      // Rival__c is a lookup to the Rival custom object fgadf
       acc.Rival__c  = comp.Name; 
     }
   }
