@@ -1,5 +1,5 @@
 // Automatically populate a lookup field to the Rival object
-trigger GetRival on Account(after insert, after update) {
+trigger GetRival on Account(before insert, before update) {
     List<Account> accRivals = new List<Account>();
     for (Account acc : Trigger.new) {
         if (acc.Rival_Picklist__c != null) {
@@ -7,9 +7,11 @@ trigger GetRival on Account(after insert, after update) {
         }
 
         // Find the Rival record based on the picklist value
-        List<Rival__c> rivals = [SELECT Id, Name, AccountId FROM Rival__c WHERE Name IN :accRivals];
+        Map<Id, Rival__c> rivalsMap = new Map<Id, Rival__c>([SELECT Id, Name, AccountId FROM Rival__c WHERE Name IN :accRivals]);
 
         // Rival__c is a lookup to the Rival custom object
-        acc.Rival__c = comp.Name;
+        for (Account acc : Trigger.new) {
+            acc.Rival__c = rivalsMap.get(acc.Id).Name;
+        }
     }
 }
