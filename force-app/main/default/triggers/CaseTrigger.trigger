@@ -22,7 +22,7 @@ trigger CaseTrigger on Case(before insert, before update) {
 
     for (Case c : Trigger.New) {
         if (caseOwnerMap.get(c.OwnerId) > 2) {
-            c.addError('This Ownder has more than 2 Cases created in the last month');
+            c.addError('This Owner has more than 2 Cases created in the last month!');
         }
     }
 }
